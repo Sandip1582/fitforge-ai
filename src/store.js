@@ -8,6 +8,16 @@ const defaultStats = {
   currentWeight: defaultUser.weight,
   proteinToday: 0,
   streak: 0,
+  weightHistory: [{ week: 'W1', weight: defaultUser.weight }],
+  weeklyActivity: [
+    { day: 'Mon', calories: 0 },
+    { day: 'Tue', calories: 0 },
+    { day: 'Wed', calories: 0 },
+    { day: 'Thu', calories: 0 },
+    { day: 'Fri', calories: 0 },
+    { day: 'Sat', calories: 0 },
+    { day: 'Sun', calories: 0 },
+  ],
 };
 
 export const useStore = create(
@@ -59,11 +69,23 @@ export const useStore = create(
       
       completeWorkout: (calories) => set((state) => {
         if (!state.activeUser) return state;
+        
+        // Find current day
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const currentDay = days[new Date().getDay()];
+        
+        const newActivity = [...state.stats.weeklyActivity];
+        const dayIndex = newActivity.findIndex(a => a.day === currentDay);
+        if (dayIndex !== -1) {
+          newActivity[dayIndex] = { ...newActivity[dayIndex], calories: newActivity[dayIndex].calories + calories };
+        }
+
         const newStats = {
           ...state.stats,
           workoutsCompleted: state.stats.workoutsCompleted + 1,
           caloriesBurned: state.stats.caloriesBurned + calories,
           streak: state.stats.streak + 1,
+          weeklyActivity: newActivity,
         };
         return {
           stats: newStats,
@@ -76,7 +98,12 @@ export const useStore = create(
 
       updateWeight: (newWeight) => set((state) => {
         if (!state.activeUser) return state;
-        const newStats = { ...state.stats, currentWeight: newWeight };
+        
+        const currentWeek = `W${state.stats.weightHistory.length + 1}`;
+        let newHistory = [...state.stats.weightHistory, { week: currentWeek, weight: newWeight }];
+        if (newHistory.length > 12) newHistory = newHistory.slice(newHistory.length - 12);
+        
+        const newStats = { ...state.stats, currentWeight: newWeight, weightHistory: newHistory };
         const newProfile = { ...state.profile, weight: newWeight };
         return {
           stats: newStats,

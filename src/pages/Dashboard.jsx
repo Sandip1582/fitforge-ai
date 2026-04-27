@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { weeklyActivity, weightProgress, workoutPlans, progressInsights } from '../data';
+import { workoutPlans, progressInsights } from '../data';
 import { useStore } from '../store';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -110,7 +110,7 @@ export default function Dashboard() {
             <span className="tag tag-purple">This Week</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={weeklyActivity} barSize={28}>
+            <BarChart data={stats.weeklyActivity} barSize={28}>
               <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#6b6b8d', fontSize: 12 }} />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} />
@@ -132,10 +132,14 @@ export default function Dashboard() {
               <h3 className="section-title">Weight Progress</h3>
               <p className="section-subtitle">12-week trend · Target: {profile.goalWeight}kg</p>
             </div>
-            <span className="tag tag-green">-4 kg</span>
+            <span className="tag tag-green">
+              {stats.weightHistory.length > 1 
+                ? `${(stats.weightHistory[stats.weightHistory.length - 1].weight - stats.weightHistory[0].weight).toFixed(1)} kg` 
+                : '0 kg'}
+            </span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={weightProgress}>
+            <AreaChart data={stats.weightHistory}>
               <defs>
                 <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00D2FF" stopOpacity={0.3} />
