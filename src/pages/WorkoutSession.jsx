@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { workoutPlans } from '../data';
+import { useStore } from '../store';
 
 export default function WorkoutSession() {
   const navigate = useNavigate();
   const plan = workoutPlans[0]; // "Today's workout"
+  const { completeWorkout } = useStore();
   const [currentExerciseIdx, setCurrentExerciseIdx] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isResting, setIsResting] = useState(false);
@@ -12,6 +14,11 @@ export default function WorkoutSession() {
 
   const currentExercise = plan.exercises[currentExerciseIdx];
   const isFinished = currentExerciseIdx >= plan.exercises.length;
+
+  const handleFinish = () => {
+    completeWorkout(plan.calories);
+    navigate('/');
+  };
 
   // Main workout timer
   useEffect(() => {
@@ -73,7 +80,7 @@ export default function WorkoutSession() {
             <div className="stat-value">{plan.calories} kcal</div>
           </div>
         </div>
-        <button className="btn btn-primary btn-lg" onClick={() => navigate('/')}>
+        <button className="btn btn-primary btn-lg" onClick={handleFinish}>
           Finish & Return to Dashboard
         </button>
       </div>

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useStore } from './store';
 
-export default function Auth({ onLogin }) {
+export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function Auth({ onLogin }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const { login } = useStore();
 
   const handleForgotPassword = (e) => {
     e.preventDefault();
@@ -49,7 +51,7 @@ export default function Auth({ onLogin }) {
         localStorage.setItem('fitforge_users', JSON.stringify(users));
         
         // Auto-login after signup
-        onLogin();
+        login(email, name, password);
         navigate('/');
       }
     } else {
@@ -60,7 +62,7 @@ export default function Auth({ onLogin }) {
         
         if (user && user.password === password) {
           // Success
-          onLogin();
+          login(email, user.name, password);
           navigate('/');
         } else {
           // Failure

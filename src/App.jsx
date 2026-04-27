@@ -8,7 +8,7 @@ import Diet from './pages/Diet';
 import Chat from './pages/Chat';
 import Auth from './pages/Auth';
 import WorkoutSession from './pages/WorkoutSession';
-import { userData } from './data';
+import { useStore } from './store';
 
 const navItems = [
   { section: 'Main', items: [
@@ -37,20 +37,16 @@ const pageTitles = {
 export default function App() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, logout, profile } = useStore();
   const currentPage = pageTitles[location.pathname] || pageTitles['/'];
 
   if (!isAuthenticated) {
     return (
       <Routes>
-        <Route path="*" element={<Auth onLogin={() => setIsAuthenticated(true)} />} />
+        <Route path="*" element={<Auth />} />
       </Routes>
     );
   }
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-  };
 
   return (
     <div className="app-layout">
@@ -87,16 +83,16 @@ export default function App() {
 
         <div className="sidebar-footer">
           <div className="sidebar-user" style={{ marginBottom: 12 }}>
-            <div className="user-avatar">{userData.avatar}</div>
+            <div className="user-avatar">{profile.avatar || profile.name?.charAt(0) || 'U'}</div>
             <div className="user-info">
-              <div className="user-name">{userData.name}</div>
-              <div className="user-plan">{userData.plan} Plan</div>
+              <div className="user-name">{profile.name}</div>
+              <div className="user-plan">{profile.plan} Plan</div>
             </div>
           </div>
           <button 
             className="btn btn-outline" 
             style={{ width: '100%', justifyContent: 'center', borderColor: 'var(--danger)', color: 'var(--danger)' }}
-            onClick={handleLogout}
+            onClick={() => logout()}
           >
             Log Out
           </button>

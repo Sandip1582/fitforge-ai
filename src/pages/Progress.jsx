@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar } from 'recharts';
-import { weightProgress, strengthProgress, weeklyActivity, progressInsights, userData } from '../data';
+import { weightProgress, strengthProgress, weeklyActivity, progressInsights } from '../data';
+import { useStore } from '../store';
 
 const bodyMeasurements = [
   { part: 'Chest', current: '102 cm', change: '+2 cm', trend: 'up' },
@@ -25,6 +26,11 @@ const Tip = ({ active, payload, label }) => {
 
 export default function Progress() {
   const [activeTab, setActiveTab] = useState('overview');
+  const { profile, stats } = useStore();
+  
+  const consistencyData = [
+    { name: 'Completed', value: Math.round((stats.workoutsCompleted / 60) * 100), fill: '#6C5CE7' },
+  ];
 
   return (
     <div style={{ animation: 'fadeIn 0.5s ease' }}>
@@ -40,10 +46,10 @@ export default function Progress() {
           {/* Summary Cards */}
           <div className="grid-4" style={{ marginBottom: 24 }}>
             {[
-              { label: 'Current Weight', value: `${userData.weight} kg`, sub: `Goal: ${userData.goalWeight} kg`, icon: '⚖️', color: 'cyan' },
-              { label: 'Workouts Done', value: '48', sub: '12 weeks · 4/week avg', icon: '🏋️', color: 'purple' },
+              { label: 'Current Weight', value: `${stats.currentWeight} kg`, sub: `Goal: ${profile.goalWeight} kg`, icon: '⚖️', color: 'cyan' },
+              { label: 'Workouts Done', value: `${stats.workoutsCompleted}`, sub: '12 weeks · 4/week avg', icon: '🏋️', color: 'purple' },
               { label: 'Total Volume', value: '142 tons', sub: 'Lifetime weight lifted', icon: '💪', color: 'orange' },
-              { label: 'Consistency', value: '80%', sub: 'Last 12 weeks', icon: '📅', color: 'green' },
+              { label: 'Consistency', value: `${consistencyData[0].value}%`, sub: 'Last 12 weeks', icon: '📅', color: 'green' },
             ].map((s, i) => (
               <div className="stat-card" key={i}>
                 <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -113,7 +119,7 @@ export default function Progress() {
       {activeTab === 'weight' && (
         <div className="card">
           <h3 className="section-title" style={{ marginBottom: 4 }}>Weight Progress</h3>
-          <p className="section-subtitle" style={{ marginBottom: 24 }}>Started: 82 kg → Current: {userData.weight} kg → Target: {userData.goalWeight} kg</p>
+          <p className="section-subtitle" style={{ marginBottom: 24 }}>Started: 82 kg → Current: {stats.currentWeight} kg → Target: {profile.goalWeight} kg</p>
           <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={weightProgress}>
               <defs><linearGradient id="wg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00D2FF" stopOpacity={0.3}/><stop offset="100%" stopColor="#00D2FF" stopOpacity={0}/></linearGradient></defs>
@@ -181,8 +187,8 @@ export default function Progress() {
                 <RadialBar background={{ fill: 'rgba(255,255,255,0.05)' }} dataKey="value" cornerRadius={10} />
               </RadialBarChart>
             </ResponsiveContainer>
-            <div style={{ fontSize: '2.2rem', fontWeight: 800, marginTop: -120, fontFamily: 'var(--font-primary)' }}>80%</div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 60 }}>48 of 60 workouts completed</p>
+            <div style={{ fontSize: '2.2rem', fontWeight: 800, marginTop: -120, fontFamily: 'var(--font-primary)' }}>{consistencyData[0].value}%</div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 60 }}>{stats.workoutsCompleted} of 60 workouts completed</p>
           </div>
         </div>
       )}

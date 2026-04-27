@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { dashboardStats, weeklyActivity, weightProgress, userData, workoutPlans, progressInsights } from '../data';
+import { weeklyActivity, weightProgress, workoutPlans, progressInsights } from '../data';
+import { useStore } from '../store';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -17,15 +18,23 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function Dashboard() {
   const todayPlan = workoutPlans[0];
   const navigate = useNavigate();
+  const { profile, stats } = useStore();
+
+  const dashboardStats = [
+    { id: 1, label: 'Workouts This Week', value: `${stats.workoutsCompleted}/5`, change: '+1 vs last week', trend: 'up', icon: '🏋️', color: 'purple' },
+    { id: 2, label: 'Calories Burned', value: stats.caloriesBurned.toLocaleString(), change: '+12% this week', trend: 'up', icon: '🔥', color: 'orange' },
+    { id: 3, label: 'Current Weight', value: `${stats.currentWeight} kg`, change: '-0.5 kg', trend: 'up', icon: '⚖️', color: 'cyan' },
+    { id: 4, label: 'Protein Today', value: `${stats.proteinToday}g`, change: '89% of target', trend: 'up', icon: '🥩', color: 'green' },
+  ];
 
   return (
     <div style={{ animation: 'fadeIn 0.5s ease' }}>
       {/* Welcome Banner */}
       <div className="card-gradient" style={{ marginBottom: 24, padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: 8 }}>Good afternoon, {userData.name}! 💪</h2>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: 8 }}>Good afternoon, {profile.name}! 💪</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: 500 }}>
-            You've completed <strong style={{ color: 'var(--accent)' }}>4 of 5</strong> workouts this week.
+            You've completed <strong style={{ color: 'var(--accent)' }}>{stats.workoutsCompleted} of 5</strong> workouts this week.
             Your {todayPlan.name} is scheduled for today. Let's crush it!
           </p>
           <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
@@ -39,7 +48,7 @@ export default function Dashboard() {
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: 4 }}>🔥</div>
-          <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-primary)', color: 'var(--accent)' }}>{userData.streak}</div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-primary)', color: 'var(--accent)' }}>{stats.streak}</div>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Day Streak</div>
         </div>
       </div>
@@ -92,7 +101,7 @@ export default function Dashboard() {
           <div className="section-header" style={{ marginBottom: 20 }}>
             <div>
               <h3 className="section-title">Weight Progress</h3>
-              <p className="section-subtitle">12-week trend · Target: {userData.goalWeight}kg</p>
+              <p className="section-subtitle">12-week trend · Target: {profile.goalWeight}kg</p>
             </div>
             <span className="tag tag-green">-4 kg</span>
           </div>
