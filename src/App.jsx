@@ -8,6 +8,7 @@ import Diet from './pages/Diet';
 import Chat from './pages/Chat';
 import Auth from './pages/Auth';
 import WorkoutSession from './pages/WorkoutSession';
+import Subscription from './pages/Subscription';
 import { useStore } from './store';
 
 const navItems = [
@@ -23,6 +24,9 @@ const navItems = [
   { section: 'AI', items: [
     { path: '/chat', label: 'AI Trainer', icon: '🤖', badge: 'Live' },
   ]},
+  { section: 'Account', items: [
+    { path: '/subscription', label: 'Subscription', icon: '⭐' },
+  ]},
 ];
 
 const pageTitles = {
@@ -32,6 +36,7 @@ const pageTitles = {
   '/progress': { title: 'Progress', subtitle: 'Track your fitness journey with AI insights.' },
   '/diet': { title: 'Diet Plan', subtitle: 'AI-generated meal plans for your goals.' },
   '/chat': { title: 'AI Trainer Chat', subtitle: 'Ask anything about fitness, diet, or machines.' },
+  '/subscription': { title: 'Subscription', subtitle: 'Manage your FitForge AI plan.' },
 };
 
 export default function App() {
@@ -138,6 +143,7 @@ export default function App() {
           <Route path="/diet" element={<Diet />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/workout-session" element={<WorkoutSession />} />
+          <Route path="/subscription" element={<Subscription />} />
         </Routes>
       </main>
     </div>
