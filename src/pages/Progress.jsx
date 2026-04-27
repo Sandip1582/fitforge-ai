@@ -118,8 +118,43 @@ export default function Progress() {
 
       {activeTab === 'weight' && (
         <div className="card">
-          <h3 className="section-title" style={{ marginBottom: 4 }}>Weight Progress</h3>
-          <p className="section-subtitle" style={{ marginBottom: 24 }}>Started: 82 kg → Current: {stats.currentWeight} kg → Target: {profile.goalWeight} kg</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+            <div>
+              <h3 className="section-title" style={{ marginBottom: 4 }}>Weight Progress</h3>
+              <p className="section-subtitle">Started: 82 kg → Current: {stats.currentWeight} kg → Target: {profile.goalWeight} kg</p>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input 
+                type="number" 
+                id="new-weight-input"
+                className="form-input" 
+                placeholder="New weight (kg)" 
+                style={{ width: 140, padding: '8px 12px' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const val = parseFloat(e.target.value);
+                    if (val > 0) {
+                      useStore.getState().updateWeight(val);
+                      e.target.value = '';
+                    }
+                  }
+                }}
+              />
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  const input = document.getElementById('new-weight-input');
+                  const val = parseFloat(input.value);
+                  if (val > 0) {
+                    useStore.getState().updateWeight(val);
+                    input.value = '';
+                  }
+                }}
+              >
+                Update
+              </button>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={weightProgress}>
               <defs><linearGradient id="wg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00D2FF" stopOpacity={0.3}/><stop offset="100%" stopColor="#00D2FF" stopOpacity={0}/></linearGradient></defs>

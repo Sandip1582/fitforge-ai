@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { chatSuggestions, userData } from '../data';
+import { chatSuggestions } from '../data';
+import { useStore } from '../store';
 
 const aiResponses = {
   'push': `Here's a **Push Day** workout tailored for you:\n\n**Warm-up:** 5 min treadmill + arm circles\n\n1. **Barbell Bench Press** — 4 × 8-10 (90s rest)\n2. **Overhead Press** — 4 × 8-10 (90s rest)\n3. **Incline Dumbbell Press** — 3 × 10-12 (60s rest)\n4. **Cable Flyes** — 3 × 12-15 (60s rest)\n5. **Lateral Raises** — 3 × 15 (45s rest)\n6. **Tricep Pushdowns** — 3 × 12-15 (45s rest)\n\n**Estimated Duration:** 55 minutes\n**Estimated Calories:** 480 kcal\n\n💡 Focus on controlled eccentric (3 sec lowering). Progressive overload is key!`,
@@ -15,17 +16,18 @@ const aiResponses = {
   'rear delts': `## Rear Delt Exercises 🎯\n\nHere are the best exercises for targeting your rear deltoids:\n\n1. **Face Pulls** (Cable) — 4 × 15-20\n   Best overall rear delt exercise\n\n2. **Reverse Pec Deck** — 3 × 12-15\n   Great for isolation\n\n3. **Bent-Over Reverse Flyes** — 3 × 12-15\n   Dumbbell variation\n\n4. **Band Pull-Aparts** — 3 × 20\n   Perfect warm-up exercise\n\n5. **Wide-Grip Rows** — 3 × 10-12\n   Compound movement\n\n**Pro Tips:**\n- Rear delts respond well to higher reps (15-20)\n- Train them 2-3x per week for best results\n- Focus on the squeeze, not the weight\n- Include them in both push AND pull days`,
 };
 
-function getAIResponse(msg) {
+function getAIResponse(msg, profile) {
   const lower = msg.toLowerCase();
   for (const [key, response] of Object.entries(aiResponses)) {
     if (lower.includes(key)) return response;
   }
-  return `Great question! Based on your profile (${userData.fitnessLevel} level, ${userData.goal.replace('_',' ')} goal), here's my recommendation:\n\n${msg.length > 20 ? 'I\'ve analyzed your query and ' : ''}Let me break this down for you:\n\n1. **Current Status:** You're making good progress with your training\n2. **Suggestion:** Continue with your current PPL split while focusing on progressive overload\n3. **Nutrition:** Maintain your current caloric deficit of 300 kcal\n\nWould you like me to:\n- 🏋️ Generate a specific workout?\n- 🥗 Create a meal plan?\n- 📊 Analyze your progress data?\n- 🔧 Explain a machine?\n\nJust ask! I'm here to help you reach your goals. 💪`;
+  return `Great question! Based on your profile (${profile.fitnessLevel} level, ${profile.goal.replace('_',' ')} goal), here's my recommendation:\n\n${msg.length > 20 ? 'I\'ve analyzed your query and ' : ''}Let me break this down for you:\n\n1. **Current Status:** You're making good progress with your training\n2. **Suggestion:** Continue with your current PPL split while focusing on progressive overload\n3. **Nutrition:** Maintain your current caloric deficit of 300 kcal\n\nWould you like me to:\n- 🏋️ Generate a specific workout?\n- 🥗 Create a meal plan?\n- 📊 Analyze your progress data?\n- 🔧 Explain a machine?\n\nJust ask! I'm here to help you reach your goals. 💪`;
 }
 
 export default function Chat() {
+  const { profile } = useStore();
   const [messages, setMessages] = useState([
-    { id: 1, role: 'ai', text: `Hey ${userData.name}! 👋 I'm your AI Fitness Trainer. I can help you with:\n\n🏋️ **Workout Plans** — Custom routines for your goals\n🔧 **Machine Guides** — How to use any gym equipment\n📊 **Progress Analysis** — Insights from your data\n🥗 **Diet Plans** — Personalized meal recommendations\n\nWhat would you like help with today?` }
+    { id: 1, role: 'ai', text: `Hey ${profile.name}! 👋 I'm your AI Fitness Trainer. I can help you with:\n\n🏋️ **Workout Plans** — Custom routines for your goals\n🔧 **Machine Guides** — How to use any gym equipment\n📊 **Progress Analysis** — Insights from your data\n🥗 **Diet Plans** — Personalized meal recommendations\n\nWhat would you like help with today?` }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -43,7 +45,7 @@ export default function Chat() {
     setIsTyping(true);
 
     setTimeout(() => {
-      const aiMsg = { id: Date.now() + 1, role: 'ai', text: getAIResponse(text) };
+      const aiMsg = { id: Date.now() + 1, role: 'ai', text: getAIResponse(text, profile) };
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
     }, 1200 + Math.random() * 800);
@@ -82,7 +84,7 @@ export default function Chat() {
         {messages.map(msg => (
           <div key={msg.id} className={`chat-msg ${msg.role}`}>
             <div className="chat-avatar">
-              {msg.role === 'ai' ? '🤖' : userData.avatar}
+              {msg.role === 'ai' ? '🤖' : (profile.avatar || profile.name?.charAt(0) || 'U')}
             </div>
             <div className="chat-bubble" dangerouslySetInnerHTML={{ __html: formatText(msg.text) }} />
           </div>
