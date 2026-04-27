@@ -43,12 +43,17 @@ export default function Dashboard() {
     { id: 4, label: 'Protein Today', value: `${stats.proteinToday}g`, change: `${Math.round((stats.proteinToday / 160) * 100)}% of target`, trend: stats.proteinToday > 0 ? 'up' : 'neutral', icon: '🥩', color: 'green' },
   ];
 
+  const hour = new Date().getHours();
+  let greeting = 'Good evening';
+  if (hour < 12) greeting = 'Good morning';
+  else if (hour < 18) greeting = 'Good afternoon';
+
   return (
     <div style={{ animation: 'fadeIn 0.5s ease' }}>
       {/* Welcome Banner */}
       <div className="card-gradient" style={{ marginBottom: 24, padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: 8 }}>Good afternoon, {profile.name}! 💪</h2>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: 8 }}>{greeting}, {profile.name}! 💪</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: 500 }}>
             You've completed <strong style={{ color: 'var(--accent)' }}>{stats.workoutsCompleted} of 5</strong> workouts this week.
             Your {todayPlan.name} is scheduled for today. Let's crush it!
