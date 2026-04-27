@@ -6,14 +6,44 @@ export default function Auth({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In a real app, this would call an API. Here we just simulate auth.
-    if (email && password) {
-      onLogin();
-      navigate('/');
+    setError('');
+
+    if (!isLogin) {
+      // Handle Sign Up
+      if (email && password && name) {
+        // Save to local storage to simulate a database
+        const users = JSON.parse(localStorage.getItem('fitforge_users') || '{}');
+        if (users[email]) {
+          setError('An account with this email already exists.');
+          return;
+        }
+        users[email] = { password, name };
+        localStorage.setItem('fitforge_users', JSON.stringify(users));
+        
+        // Auto-login after signup
+        onLogin();
+        navigate('/');
+      }
+    } else {
+      // Handle Sign In
+      if (email && password) {
+        const users = JSON.parse(localStorage.getItem('fitforge_users') || '{}');
+        const user = users[email];
+        
+        if (user && user.password === password) {
+          // Success
+          onLogin();
+          navigate('/');
+        } else {
+          // Failure
+          setError('Invalid email or password. Please try again or create an account.');
+        }
+      }
     }
   };
 
@@ -59,6 +89,21 @@ export default function Auth({ onLogin }) {
             {isLogin ? 'Welcome back! Ready to crush your goals?' : 'Join the fitness revolution today.'}
           </p>
         </div>
+
+        {error && (
+          <div style={{
+            background: 'rgba(255,107,107,0.15)',
+            border: '1px solid rgba(255,107,107,0.3)',
+            color: 'var(--danger)',
+            padding: '12px 16px',
+            borderRadius: 'var(--radius-sm)',
+            marginBottom: '20px',
+            fontSize: '0.85rem',
+            textAlign: 'center'
+          }}>
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           {!isLogin && (
