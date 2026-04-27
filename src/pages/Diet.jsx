@@ -3,7 +3,33 @@ import { mealPlans, vegMealPlans, userData } from '../data';
 
 export default function Diet() {
   const [dietType, setDietType] = useState('non-veg');
-  const plan = dietType === 'veg' ? vegMealPlans : mealPlans;
+  const [selectedDay, setSelectedDay] = useState(new Date().toLocaleDateString('en-US', { weekday: 'long' }));
+  
+  const basePlan = dietType === 'veg' ? vegMealPlans : mealPlans;
+  
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const dayIndex = days.indexOf(selectedDay);
+  
+  // Dynamically generate a slightly different plan for each day
+  const plan = {
+    ...basePlan,
+    calories: basePlan.calories + (dayIndex * 25) - 75,
+    protein: basePlan.protein + (dayIndex * 3) - 9,
+    carbs: basePlan.carbs + (dayIndex * 5) - 15,
+    meals: basePlan.meals.map((meal, i) => {
+      // Simulate different meals by changing names or calories slightly on different days
+      let newName = meal.name;
+      if (dayIndex % 2 !== 0 && dietType === 'non-veg' && i === 2) newName = 'Tuna & Quinoa Bowl';
+      if (dayIndex % 2 !== 0 && dietType === 'veg' && i === 2) newName = 'Chickpea & Spinach Curry';
+      if (dayIndex === 6 && i === 4) newName = 'Cheat Meal / Free Choice';
+
+      return {
+        ...meal,
+        name: newName,
+        calories: meal.calories + (dayIndex * 5) - 15,
+      };
+    })
+  };
 
   const proteinPct = Math.round((plan.protein * 4 / plan.calories) * 100);
   const carbsPct = Math.round((plan.carbs * 4 / plan.calories) * 100);
@@ -12,12 +38,34 @@ export default function Diet() {
   return (
     <div style={{ animation: 'fadeIn 0.5s ease' }}>
       {/* Diet Type Toggle */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div className="tabs" style={{ marginBottom: 0 }}>
           <button className={`tab-btn ${dietType === 'non-veg' ? 'active' : ''}`} onClick={() => setDietType('non-veg')}>🍗 Non-Veg</button>
           <button className={`tab-btn ${dietType === 'veg' ? 'active' : ''}`} onClick={() => setDietType('veg')}>🥬 Vegetarian</button>
         </div>
-        <button className="btn btn-primary btn-sm" id="regenerate-diet-btn">🤖 Regenerate Plan</button>
+        <button className="btn btn-primary btn-sm" id="regenerate-diet-btn">🤖 Regenerate Week</button>
+      </div>
+
+      {/* Day Selector */}
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 16, marginBottom: 16, scrollbarWidth: 'none' }}>
+        {days.map(day => (
+          <button 
+            key={day}
+            onClick={() => setSelectedDay(day)}
+            style={{ 
+              padding: '8px 16px', 
+              borderRadius: 20, 
+              border: `1px solid ${selectedDay === day ? 'var(--primary)' : 'var(--border)'}`,
+              background: selectedDay === day ? 'rgba(108,92,231,0.15)' : 'var(--bg-card)',
+              color: selectedDay === day ? 'var(--primary-light)' : 'var(--text-secondary)',
+              fontWeight: selectedDay === day ? 600 : 400,
+              cursor: 'pointer',
+              minWidth: 'fit-content'
+            }}
+          >
+            {day}
+          </button>
+        ))}
       </div>
 
       {/* Macro Summary */}
@@ -67,7 +115,7 @@ export default function Diet() {
 
       {/* Meals */}
       <div className="section-header" style={{ marginBottom: 16 }}>
-        <h3 className="section-title">Today's Meal Plan</h3>
+        <h3 className="section-title">{selectedDay}'s Meal Plan</h3>
         <button className="btn btn-outline btn-sm" id="grocery-list-btn">🛒 Grocery List</button>
       </div>
 
