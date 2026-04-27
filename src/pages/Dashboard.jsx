@@ -18,13 +18,29 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function Dashboard() {
   const todayPlan = workoutPlans[0];
   const navigate = useNavigate();
-  const { profile, stats } = useStore();
+  const { profile, stats, updateWeight, updateProtein } = useStore();
+
+  const handleStatClick = (id) => {
+    if (id === 3) { // Weight
+      const newWeight = prompt(`Enter new weight (Current: ${stats.currentWeight}kg):`);
+      if (newWeight && !isNaN(newWeight) && Number(newWeight) > 0) {
+        updateWeight(Number(newWeight));
+      }
+    } else if (id === 4) { // Protein
+      const addedProtein = prompt('How many grams of protein did you just eat?');
+      if (addedProtein && !isNaN(addedProtein) && Number(addedProtein) > 0) {
+        updateProtein(Number(addedProtein));
+      }
+    } else if (id === 1) { // Workouts
+      navigate('/workouts');
+    }
+  };
 
   const dashboardStats = [
-    { id: 1, label: 'Workouts This Week', value: `${stats.workoutsCompleted}/5`, change: '+1 vs last week', trend: 'up', icon: '🏋️', color: 'purple' },
-    { id: 2, label: 'Calories Burned', value: stats.caloriesBurned.toLocaleString(), change: '+12% this week', trend: 'up', icon: '🔥', color: 'orange' },
-    { id: 3, label: 'Current Weight', value: `${stats.currentWeight} kg`, change: '-0.5 kg', trend: 'up', icon: '⚖️', color: 'cyan' },
-    { id: 4, label: 'Protein Today', value: `${stats.proteinToday}g`, change: '89% of target', trend: 'up', icon: '🥩', color: 'green' },
+    { id: 1, label: 'Workouts This Week', value: `${stats.workoutsCompleted}/5`, change: stats.workoutsCompleted > 0 ? '+1 vs last week' : 'Start your week!', trend: stats.workoutsCompleted > 0 ? 'up' : 'neutral', icon: '🏋️', color: 'purple' },
+    { id: 2, label: 'Calories Burned', value: stats.caloriesBurned.toLocaleString(), change: stats.caloriesBurned > 0 ? '+12% this week' : 'Ready to burn', trend: stats.caloriesBurned > 0 ? 'up' : 'neutral', icon: '🔥', color: 'orange' },
+    { id: 3, label: 'Current Weight', value: `${stats.currentWeight} kg`, change: 'Tap to update', trend: 'neutral', icon: '⚖️', color: 'cyan' },
+    { id: 4, label: 'Protein Today', value: `${stats.proteinToday}g`, change: `${Math.round((stats.proteinToday / 160) * 100)}% of target`, trend: stats.proteinToday > 0 ? 'up' : 'neutral', icon: '🥩', color: 'green' },
   ];
 
   return (
@@ -56,13 +72,21 @@ export default function Dashboard() {
       {/* Stat Cards */}
       <div className="grid-4" style={{ marginBottom: 24 }}>
         {dashboardStats.map(stat => (
-          <div className="stat-card" key={stat.id} id={`stat-${stat.id}`}>
+          <div 
+            className="stat-card" 
+            key={stat.id} 
+            id={`stat-${stat.id}`}
+            onClick={() => handleStatClick(stat.id)}
+            style={{ cursor: stat.id === 3 || stat.id === 4 || stat.id === 1 ? 'pointer' : 'default', transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onMouseOver={(e) => { if(stat.id === 3 || stat.id === 4 || stat.id === 1) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-glow)'; } }}
+            onMouseOut={(e) => { if(stat.id === 3 || stat.id === 4 || stat.id === 1) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; } }}
+          >
             <div className={`stat-icon ${stat.color}`}>{stat.icon}</div>
             <div className="stat-info">
               <div className="stat-label">{stat.label}</div>
               <div className="stat-value">{stat.value}</div>
               <div className={`stat-change ${stat.trend}`}>
-                {stat.trend === 'up' ? '↑' : '↓'} {stat.change}
+                {stat.trend === 'up' ? '↑' : stat.trend === 'down' ? '↓' : ''} {stat.change}
               </div>
             </div>
           </div>
