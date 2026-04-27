@@ -45,8 +45,8 @@ export const useStore = create(
         // Retrieve existing user data or create new
         const existingData = state.allUsersData[email];
         
-        const newProfile = existingData ? existingData.profile : { ...defaultUser, name: name, email: email };
-        const newStats = existingData ? existingData.stats : { ...defaultStats };
+        const newProfile = existingData ? { ...defaultUser, ...existingData.profile } : { ...defaultUser, name: name, email: email };
+        const newStats = existingData ? { ...defaultStats, ...existingData.stats } : { ...defaultStats };
 
         return {
           isAuthenticated: true, 

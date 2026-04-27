@@ -9,7 +9,10 @@ const CustomTooltip = ({ active, payload, label }) => {
     <div style={{ background: '#1a1a3e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '10px 14px', fontSize: '0.78rem' }}>
       <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color }}>{p.name}: {p.value}{p.name === 'calories' ? ' kcal' : ' min'}</p>
+        <p key={i} style={{ color: p.color }}>
+          {p.name}: {p.value}
+          {p.name === 'calories' ? ' kcal' : p.name === 'weight' ? ' kg' : ' min'}
+        </p>
       ))}
     </div>
   );
@@ -110,7 +113,7 @@ export default function Dashboard() {
             <span className="tag tag-purple">This Week</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={stats.weeklyActivity} barSize={28}>
+            <BarChart data={stats.weeklyActivity || []} barSize={28}>
               <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#6b6b8d', fontSize: 12 }} />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} />
@@ -139,7 +142,7 @@ export default function Dashboard() {
             </span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={stats.weightHistory}>
+            <AreaChart data={stats.weightHistory || []}>
               <defs>
                 <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00D2FF" stopOpacity={0.3} />
