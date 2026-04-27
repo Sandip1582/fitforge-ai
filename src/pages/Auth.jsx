@@ -1,0 +1,122 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+export default function Auth({ onLogin }) {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // In a real app, this would call an API. Here we just simulate auth.
+    if (email && password) {
+      onLogin();
+      navigate('/');
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+      background: 'var(--bg-dark)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Background decorations */}
+      <div style={{
+        position: 'absolute', top: '-10%', left: '-10%', width: '50%', height: '50%',
+        background: 'radial-gradient(circle, rgba(108,92,231,0.15) 0%, transparent 70%)',
+        filter: 'blur(40px)', zIndex: 0
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-10%', right: '-10%', width: '50%', height: '50%',
+        background: 'radial-gradient(circle, rgba(0,210,255,0.1) 0%, transparent 70%)',
+        filter: 'blur(40px)', zIndex: 0
+      }} />
+
+      <div className="card-glass" style={{
+        width: '100%',
+        maxWidth: 420,
+        zIndex: 1,
+        animation: 'fadeInUp 0.5s ease',
+        padding: '40px 32px'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{
+            width: 60, height: 60, background: 'var(--gradient-primary)',
+            borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', fontSize: '28px', margin: '0 auto 16px',
+            boxShadow: 'var(--shadow-glow)'
+          }}>⚡</div>
+          <h2 style={{ fontSize: '1.8rem', marginBottom: 8, fontFamily: 'var(--font-primary)' }}>FitForge AI</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            {isLogin ? 'Welcome back! Ready to crush your goals?' : 'Join the fitness revolution today.'}
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {!isLogin && (
+            <div className="form-group">
+              <label className="form-label">Full Name</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="John Doe"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
+          <div className="form-group">
+            <label className="form-label">Email Address</label>
+            <input
+              type="email"
+              className="form-input"
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label className="form-label" style={{ margin: 0 }}>Password</label>
+              {isLogin && <a href="#" style={{ fontSize: '0.75rem', color: 'var(--accent)' }}>Forgot password?</a>}
+            </div>
+            <input
+              type="password"
+              className="form-input"
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }}>
+            {isLogin ? 'Sign In' : 'Create Account'}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', marginTop: 24, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            style={{ color: 'var(--primary-light)', fontWeight: 600, background: 'none', padding: 0 }}
+          >
+            {isLogin ? 'Sign Up' : 'Sign In'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

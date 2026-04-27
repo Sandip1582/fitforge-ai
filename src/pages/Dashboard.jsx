@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { dashboardStats, weeklyActivity, weightProgress, userData, workoutPlans, progressInsights } from '../data';
 
@@ -15,6 +16,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function Dashboard() {
   const todayPlan = workoutPlans[0];
+  const navigate = useNavigate();
 
   return (
     <div style={{ animation: 'fadeIn 0.5s ease' }}>
@@ -27,8 +29,12 @@ export default function Dashboard() {
             Your {todayPlan.name} is scheduled for today. Let's crush it!
           </p>
           <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-            <button className="btn btn-primary" id="start-workout-btn">🏋️ Start Today's Workout</button>
-            <button className="btn btn-outline" id="view-plan-btn">📋 View Full Plan</button>
+            <button className="btn btn-primary" id="start-workout-btn" onClick={() => navigate('/workout-session')}>
+              🏋️ Start Today's Workout
+            </button>
+            <button className="btn btn-outline" id="view-plan-btn" onClick={() => navigate('/workouts')}>
+              📋 View Full Plan
+            </button>
           </div>
         </div>
         <div style={{ textAlign: 'center' }}>

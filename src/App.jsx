@@ -6,6 +6,8 @@ import Machines from './pages/Machines';
 import Progress from './pages/Progress';
 import Diet from './pages/Diet';
 import Chat from './pages/Chat';
+import Auth from './pages/Auth';
+import WorkoutSession from './pages/WorkoutSession';
 import { userData } from './data';
 
 const navItems = [
@@ -35,7 +37,20 @@ const pageTitles = {
 export default function App() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const currentPage = pageTitles[location.pathname] || pageTitles['/'];
+
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="*" element={<Auth onLogin={() => setIsAuthenticated(true)} />} />
+      </Routes>
+    );
+  }
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
 
   return (
     <div className="app-layout">
@@ -71,13 +86,20 @@ export default function App() {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="sidebar-user">
+          <div className="sidebar-user" style={{ marginBottom: 12 }}>
             <div className="user-avatar">{userData.avatar}</div>
             <div className="user-info">
               <div className="user-name">{userData.name}</div>
               <div className="user-plan">{userData.plan} Plan</div>
             </div>
           </div>
+          <button 
+            className="btn btn-outline" 
+            style={{ width: '100%', justifyContent: 'center', borderColor: 'var(--danger)', color: 'var(--danger)' }}
+            onClick={handleLogout}
+          >
+            Log Out
+          </button>
         </div>
       </aside>
 
@@ -120,6 +142,7 @@ export default function App() {
           <Route path="/progress" element={<Progress />} />
           <Route path="/diet" element={<Diet />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/workout-session" element={<WorkoutSession />} />
         </Routes>
       </main>
     </div>
