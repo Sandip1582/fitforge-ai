@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStore } from './store';
+import { useStore } from '../store';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
