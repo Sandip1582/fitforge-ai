@@ -103,8 +103,7 @@ export default function App() {
       <header className="header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button
-            className="header-btn"
-            style={{ display: 'none' }}
+            className="header-btn menu-toggle-btn"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             id="menu-toggle"
           >
