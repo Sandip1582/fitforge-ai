@@ -6,6 +6,8 @@ export default function Subscription() {
   const [showModal, setShowModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success'
+  const [paymentMethod, setPaymentMethod] = useState('card'); // 'card', 'upi'
+  const [upiId, setUpiId] = useState('');
 
   const handleUpgradeClick = (planName) => {
     if (profile.plan === planName) return;
@@ -128,57 +130,119 @@ export default function Subscription() {
                 <h3 style={{ fontSize: '1.5rem', marginBottom: 8 }}>Complete Payment</h3>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>You are upgrading to <strong>{selectedPlan} Plan</strong></p>
 
-                {/* Mock Credit Card */}
-                <div style={{ 
-                  background: 'linear-gradient(135deg, #6C5CE7, #a29bfe)', 
-                  borderRadius: 16, 
-                  padding: 24, 
-                  marginBottom: 24, 
-                  color: 'white',
-                  boxShadow: '0 10px 20px rgba(108, 92, 231, 0.3)'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>FITFORGE</div>
-                    <div style={{ fontSize: '1.5rem' }}>💳</div>
-                  </div>
-                  <div style={{ fontSize: '1.2rem', letterSpacing: 4, marginBottom: 20 }}>•••• •••• •••• 4242</div>
-                  <div style={{ display: 'flex', gap: 32 }}>
-                    <div>
-                      <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Card Holder</div>
-                      <div style={{ fontSize: '0.85rem' }}>{profile.name?.toUpperCase()}</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Expires</div>
-                      <div style={{ fontSize: '0.85rem' }}>12/28</div>
-                    </div>
-                  </div>
+                {/* Payment Method Toggle */}
+                <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+                  <button 
+                    onClick={() => setPaymentMethod('card')}
+                    style={{ 
+                      flex: 1, padding: '12px', borderRadius: 12, border: '1px solid', 
+                      borderColor: paymentMethod === 'card' ? 'var(--primary)' : 'var(--border)',
+                      background: paymentMethod === 'card' ? 'rgba(108, 92, 231, 0.1)' : 'transparent',
+                      color: paymentMethod === 'card' ? 'var(--primary-light)' : 'var(--text-muted)',
+                      cursor: 'pointer', transition: 'all 0.3s ease'
+                    }}
+                  >
+                    💳 Card
+                  </button>
+                  <button 
+                    onClick={() => setPaymentMethod('upi')}
+                    style={{ 
+                      flex: 1, padding: '12px', borderRadius: 12, border: '1px solid', 
+                      borderColor: paymentMethod === 'upi' ? 'var(--primary)' : 'var(--border)',
+                      background: paymentMethod === 'upi' ? 'rgba(108, 92, 231, 0.1)' : 'transparent',
+                      color: paymentMethod === 'upi' ? 'var(--primary-light)' : 'var(--text-muted)',
+                      cursor: 'pointer', transition: 'all 0.3s ease'
+                    }}
+                  >
+                    📱 UPI
+                  </button>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Email Address</label>
-                  <input type="email" className="form-input" defaultValue={profile.email} readOnly />
-                </div>
+                {paymentMethod === 'card' ? (
+                  <>
+                    {/* Mock Credit Card */}
+                    <div style={{ 
+                      background: 'linear-gradient(135deg, #6C5CE7, #a29bfe)', 
+                      borderRadius: 16, 
+                      padding: 24, 
+                      marginBottom: 24, 
+                      color: 'white',
+                      boxShadow: '0 10px 20px rgba(108, 92, 231, 0.3)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>FITFORGE</div>
+                        <div style={{ fontSize: '1.5rem' }}>💳</div>
+                      </div>
+                      <div style={{ fontSize: '1.2rem', letterSpacing: 4, marginBottom: 20 }}>•••• •••• •••• 4242</div>
+                      <div style={{ display: 'flex', gap: 32 }}>
+                        <div>
+                          <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Card Holder</div>
+                          <div style={{ fontSize: '0.85rem' }}>{profile.name?.toUpperCase()}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Expires</div>
+                          <div style={{ fontSize: '0.85rem' }}>12/28</div>
+                        </div>
+                      </div>
+                    </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <div className="form-group">
-                    <label className="form-label">Expiry Date</label>
-                    <input type="text" className="form-input" placeholder="MM/YY" defaultValue="12/28" />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                      <div className="form-group">
+                        <label className="form-label">Expiry Date</label>
+                        <input type="text" className="form-input" placeholder="MM/YY" defaultValue="12/28" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">CVC</label>
+                        <input type="password" className="form-input" placeholder="•••" defaultValue="123" />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ paddingBottom: 24 }}>
+                    <div style={{ background: 'var(--bg-surface)', padding: 20, borderRadius: 16, border: '1px solid var(--border)', marginBottom: 16 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                        <div style={{ width: 40, height: 40, background: '#fff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                          🇮🇳
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>UPI Payment</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>GPay, PhonePe, Paytm, etc.</div>
+                        </div>
+                      </div>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">UPI ID</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="username@bank" 
+                          value={upiId}
+                          onChange={(e) => setUpiId(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+                      {['@okaxis', '@okicici', '@paytm', '@ybl'].map(suffix => (
+                        <span 
+                          key={suffix} 
+                          onClick={() => setUpiId(upiId.split('@')[0] + suffix)}
+                          style={{ fontSize: '0.7rem', padding: '4px 10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 20, cursor: 'pointer' }}
+                        >
+                          {suffix}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">CVC</label>
-                    <input type="password" className="form-input" placeholder="•••" defaultValue="123" />
-                  </div>
-                </div>
+                )}
 
                 <button 
                   className="btn btn-primary" 
                   style={{ width: '100%', marginTop: 8, height: 48, justifyContent: 'center', fontSize: '1rem' }}
                   onClick={handleProcessPayment}
                 >
-                  Pay {selectedPlan === 'Pro' ? '$9.99' : '$24.99'} Now
+                  {paymentMethod === 'card' ? `Pay $${selectedPlan === 'Pro' ? '9.99' : '24.99'}` : 'Verify & Pay'}
                 </button>
                 <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 16 }}>
-                  🛡️ Secure encrypted payment via Stripe Mock
+                  🛡️ Secure encrypted payment via {paymentMethod === 'card' ? 'Stripe' : 'UPI'} Mock
                 </p>
               </div>
             )}
@@ -186,8 +250,10 @@ export default function Subscription() {
             {paymentStep === 'processing' && (
               <div style={{ textAlign: 'center', padding: '40px 0', animation: 'fadeIn 0.3s ease' }}>
                 <div className="loading-spinner" style={{ margin: '0 auto 24px', width: 50, height: 50, border: '4px solid rgba(108, 92, 231, 0.1)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                <h3>Processing Payment...</h3>
-                <p style={{ color: 'var(--text-secondary)', marginTop: 8 }}>Please do not refresh the page</p>
+                <h3>{paymentMethod === 'upi' ? 'Waiting for Approval...' : 'Processing Payment...'}</h3>
+                <p style={{ color: 'var(--text-secondary)', marginTop: 8 }}>
+                  {paymentMethod === 'upi' ? 'Check your UPI app to approve the request' : 'Please do not refresh the page'}
+                </p>
               </div>
             )}
 
