@@ -1,14 +1,25 @@
+import { useState } from 'react';
 import { useStore } from '../store';
 
 export default function Subscription() {
   const { profile, upgradePlan } = useStore();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success'
 
-  const handleUpgrade = (planName) => {
+  const handleUpgradeClick = (planName) => {
     if (profile.plan === planName) return;
-    
-    // In a real app, this would redirect to Stripe Checkout
-    alert(`Redirecting to payment gateway for the ${planName} plan...`);
-    upgradePlan(planName);
+    setSelectedPlan(planName);
+    setPaymentStep('form');
+    setShowModal(true);
+  };
+
+  const handleProcessPayment = () => {
+    setPaymentStep('processing');
+    setTimeout(() => {
+      setPaymentStep('success');
+      upgradePlan(selectedPlan);
+    }, 2500);
   };
 
   return (
@@ -66,7 +77,7 @@ export default function Subscription() {
           <button 
             className={`btn ${profile.plan === 'Pro' ? 'btn-outline' : 'btn-primary'}`}
             style={{ width: '100%', justifyContent: 'center' }}
-            onClick={() => handleUpgrade('Pro')}
+            onClick={() => handleUpgradeClick('Pro')}
             disabled={profile.plan === 'Pro'}
           >
             {profile.plan === 'Pro' ? 'Current Plan' : 'Upgrade to Pro'}
@@ -91,13 +102,124 @@ export default function Subscription() {
           <button 
             className={`btn ${profile.plan === 'Elite' ? 'btn-outline' : 'btn-primary'}`}
             style={{ width: '100%', justifyContent: 'center' }}
-            onClick={() => handleUpgrade('Elite')}
+            onClick={() => handleUpgradeClick('Elite')}
             disabled={profile.plan === 'Elite'}
           >
             {profile.plan === 'Elite' ? 'Current Plan' : 'Upgrade to Elite'}
           </button>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {showModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div className="card" style={{ width: '100%', maxWidth: 450, padding: 32, position: 'relative', overflow: 'hidden' }}>
+            {paymentStep !== 'success' && (
+              <button 
+                onClick={() => setShowModal(false)}
+                style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem' }}
+              >
+                ✕
+              </button>
+            )}
+
+            {paymentStep === 'form' && (
+              <div style={{ animation: 'fadeIn 0.3s ease' }}>
+                <h3 style={{ fontSize: '1.5rem', marginBottom: 8 }}>Complete Payment</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>You are upgrading to <strong>{selectedPlan} Plan</strong></p>
+
+                {/* Mock Credit Card */}
+                <div style={{ 
+                  background: 'linear-gradient(135deg, #6C5CE7, #a29bfe)', 
+                  borderRadius: 16, 
+                  padding: 24, 
+                  marginBottom: 24, 
+                  color: 'white',
+                  boxShadow: '0 10px 20px rgba(108, 92, 231, 0.3)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>FITFORGE</div>
+                    <div style={{ fontSize: '1.5rem' }}>💳</div>
+                  </div>
+                  <div style={{ fontSize: '1.2rem', letterSpacing: 4, marginBottom: 20 }}>•••• •••• •••• 4242</div>
+                  <div style={{ display: 'flex', gap: 32 }}>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Card Holder</div>
+                      <div style={{ fontSize: '0.85rem' }}>{profile.name?.toUpperCase()}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Expires</div>
+                      <div style={{ fontSize: '0.85rem' }}>12/28</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Email Address</label>
+                  <input type="email" className="form-input" defaultValue={profile.email} readOnly />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div className="form-group">
+                    <label className="form-label">Expiry Date</label>
+                    <input type="text" className="form-input" placeholder="MM/YY" defaultValue="12/28" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">CVC</label>
+                    <input type="password" className="form-input" placeholder="•••" defaultValue="123" />
+                  </div>
+                </div>
+
+                <button 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', marginTop: 8, height: 48, justifyContent: 'center', fontSize: '1rem' }}
+                  onClick={handleProcessPayment}
+                >
+                  Pay {selectedPlan === 'Pro' ? '$9.99' : '$24.99'} Now
+                </button>
+                <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 16 }}>
+                  🛡️ Secure encrypted payment via Stripe Mock
+                </p>
+              </div>
+            )}
+
+            {paymentStep === 'processing' && (
+              <div style={{ textAlign: 'center', padding: '40px 0', animation: 'fadeIn 0.3s ease' }}>
+                <div className="loading-spinner" style={{ margin: '0 auto 24px', width: 50, height: 50, border: '4px solid rgba(108, 92, 231, 0.1)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                <h3>Processing Payment...</h3>
+                <p style={{ color: 'var(--text-secondary)', marginTop: 8 }}>Please do not refresh the page</p>
+              </div>
+            )}
+
+            {paymentStep === 'success' && (
+              <div style={{ textAlign: 'center', padding: '40px 0', animation: 'scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
+                <div style={{ width: 80, height: 80, background: 'var(--success)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', fontSize: '2.5rem', color: 'white', boxShadow: '0 0 20px rgba(0, 230, 118, 0.4)' }}>
+                  ✓
+                </div>
+                <h2 style={{ marginBottom: 12 }}>Payment Successful!</h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: 32 }}>
+                  Welcome to <strong>FitForge {selectedPlan}</strong>. Your premium features are now unlocked.
+                </p>
+                <button 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', justifyContent: 'center' }}
+                  onClick={() => setShowModal(false)}
+                >
+                  Go to Dashboard
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes scaleUp {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
