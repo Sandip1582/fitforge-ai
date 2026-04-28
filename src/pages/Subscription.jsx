@@ -7,7 +7,7 @@ export default function Subscription() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success'
   const [paymentMethod, setPaymentMethod] = useState('card'); // 'card', 'upi'
-  const [upiId, setUpiId] = useState('');
+  const [upiId, setUpiId] = useState('7620863033@ybl');
 
   const handleUpgradeClick = (planName) => {
     if (profile.plan === planName) return;
