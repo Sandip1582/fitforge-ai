@@ -140,7 +140,16 @@ export const useStore = create(
       }),
     }),
     {
-      name: 'fitforge-storage', // unique name for localStorage key
+      name: 'fitforge-storage',
+      version: 2, // Bumped version to trigger migration
+      migrate: (persistedState, version) => {
+        if (version < 2) {
+          if (persistedState && persistedState.stats) {
+            persistedState.stats = { ...defaultStats, ...persistedState.stats };
+          }
+        }
+        return persistedState;
+      },
     }
   )
 );

@@ -136,7 +136,7 @@ export default function Dashboard() {
               <p className="section-subtitle">12-week trend · Target: {profile.goalWeight}kg</p>
             </div>
             <span className="tag tag-green">
-              {stats.weightHistory.length > 1 
+              {(stats.weightHistory?.length || 0) > 1 
                 ? `${(stats.weightHistory[stats.weightHistory.length - 1].weight - stats.weightHistory[0].weight).toFixed(1)} kg` 
                 : '0 kg'}
             </span>

@@ -68,7 +68,7 @@ export default function Progress() {
               <h3 className="section-title" style={{ marginBottom: 4 }}>Weight Trend</h3>
               <p className="section-subtitle" style={{ marginBottom: 16 }}>12-week progress</p>
               <ResponsiveContainer width="100%" height={200}>
-                <AreaChart data={weightProgress}>
+                <AreaChart data={stats.weightHistory || weightProgress}>
                   <defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00D2FF" stopOpacity={0.3}/><stop offset="100%" stopColor="#00D2FF" stopOpacity={0}/></linearGradient></defs>
                   <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: '#6b6b8d', fontSize: 11 }} />
                   <YAxis domain={['dataMin-1','dataMax+1']} hide />
@@ -82,7 +82,7 @@ export default function Progress() {
               <h3 className="section-title" style={{ marginBottom: 4 }}>Weekly Calories Burned</h3>
               <p className="section-subtitle" style={{ marginBottom: 16 }}>This week</p>
               <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={weeklyActivity} barSize={24}>
+                <BarChart data={stats.weeklyActivity || weeklyActivity} barSize={24}>
                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#6b6b8d', fontSize: 11 }} />
                   <YAxis hide />
                   <Tooltip content={<Tip />} />
@@ -156,7 +156,7 @@ export default function Progress() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={350}>
-            <AreaChart data={weightProgress}>
+            <AreaChart data={stats.weightHistory || weightProgress}>
               <defs><linearGradient id="wg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00D2FF" stopOpacity={0.3}/><stop offset="100%" stopColor="#00D2FF" stopOpacity={0}/></linearGradient></defs>
               <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: '#6b6b8d', fontSize: 12 }} />
               <YAxis domain={['dataMin-1','dataMax+1']} axisLine={false} tickLine={false} tick={{ fill: '#6b6b8d', fontSize: 12 }} />
