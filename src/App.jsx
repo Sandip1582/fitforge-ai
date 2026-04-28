@@ -48,7 +48,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  const { isAuthenticated, logout, profile, stats, updateWeight } = useStore();
+  const { isAuthenticated, logout, profile, stats, updateWeight, updateProfile } = useStore();
   const currentPage = pageTitles[location.pathname] || pageTitles['/'];
 
   const filteredExercises = searchQuery 
@@ -62,6 +62,8 @@ export default function App() {
       </Routes>
     );
   }
+
+  if (!profile || !stats) return <div className="loading">Loading FitForge...</div>;
 
   return (
     <div className="app-layout">
