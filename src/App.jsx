@@ -108,11 +108,22 @@ export default function App() {
           </div>
           <button 
             className="btn btn-outline" 
-            style={{ width: '100%', justifyContent: 'center', borderColor: 'var(--danger)', color: 'var(--danger)' }}
-            onClick={() => logout()}
+            style={{ width: '100%', justifyContent: 'center' }}
+            onClick={logout}
           >
-            Log Out
+            🚪 Logout
           </button>
+          <div style={{ 
+            marginTop: 16, 
+            textAlign: 'center', 
+            fontSize: '0.65rem', 
+            color: 'var(--text-muted)',
+            opacity: 0.6,
+            letterSpacing: '0.05em'
+          }}>
+            DEVELOPED BY <br/>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>SANDEEP NARNAWARE</span>
+          </div>
         </div>
       </aside>
 
