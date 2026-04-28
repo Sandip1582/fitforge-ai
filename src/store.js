@@ -138,6 +138,18 @@ export const useStore = create(
           }
         };
       }),
+
+      updateProfile: (updates) => set((state) => {
+        if (!state.activeUser) return state;
+        const newProfile = { ...state.profile, ...updates };
+        return {
+          profile: newProfile,
+          allUsersData: {
+            ...state.allUsersData,
+            [state.activeUser.email]: { ...state.allUsersData[state.activeUser.email], profile: newProfile }
+          }
+        };
+      }),
     }),
     {
       name: 'fitforge-storage',

@@ -10,6 +10,7 @@ import Auth from './pages/Auth';
 import WorkoutSession from './pages/WorkoutSession';
 import Subscription from './pages/Subscription';
 import { useStore } from './store';
+import { exercises } from './data';
 
 const navItems = [
   { section: 'Main', items: [
@@ -41,9 +42,18 @@ const pageTitles = {
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { isAuthenticated, logout, profile } = useStore();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const { isAuthenticated, logout, profile, stats, updateWeight } = useStore();
   const currentPage = pageTitles[location.pathname] || pageTitles['/'];
+
+  const filteredExercises = searchQuery 
+    ? exercises.filter(ex => ex.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5)
+    : [];
 
   if (!isAuthenticated) {
     return (
@@ -121,17 +131,104 @@ export default function App() {
         </div>
 
         <div className="header-actions">
-          <div className="header-search">
+          <div className="header-search" style={{ position: 'relative' }}>
             <span>🔍</span>
-            <input type="text" placeholder="Search exercises, machines..." id="global-search" />
+            <input 
+              type="text" 
+              placeholder="Search exercises..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              id="global-search" 
+            />
+            {filteredExercises.length > 0 && (
+              <div className="card" style={{ position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 1000, padding: 8, boxShadow: 'var(--shadow-lg)' }}>
+                {filteredExercises.map(ex => (
+                  <div 
+                    key={ex.id} 
+                    className="nav-item" 
+                    style={{ margin: 0, cursor: 'pointer' }}
+                    onClick={() => {
+                      setSearchQuery('');
+                      navigate('/workouts'); // In a real app, go to specific exercise
+                    }}
+                  >
+                    {ex.icon} {ex.name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <button className="header-btn" id="notifications-btn">
-            🔔
-            <span className="notif-dot"></span>
+          
+          <div style={{ position: 'relative' }}>
+            <button 
+              className="header-btn" 
+              id="notifications-btn"
+              onClick={() => setShowNotifications(!showNotifications)}
+            >
+              🔔
+              <span className="notif-dot"></span>
+            </button>
+            
+            {showNotifications && (
+              <div className="card" style={{ position: 'absolute', top: '110%', right: 0, width: 300, zIndex: 1000, padding: 16, boxShadow: 'var(--shadow-lg)' }}>
+                <h4 style={{ marginBottom: 12, fontSize: '0.9rem' }}>Notifications</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ fontSize: '0.8rem', padding: '8px', background: 'var(--bg-surface)', borderRadius: 8 }}>
+                    🎯 Goal Update: You are 2kg away from your target!
+                  </div>
+                  <div style={{ fontSize: '0.8rem', padding: '8px', background: 'var(--bg-surface)', borderRadius: 8 }}>
+                    🔥 3-Day Streak! Keep it up.
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button 
+            className="header-btn" 
+            id="settings-btn"
+            onClick={() => setShowSettings(true)}
+          >
+            ⚙️
           </button>
-          <button className="header-btn" id="settings-btn">⚙️</button>
         </div>
       </header>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div className="card" style={{ width: '100%', maxWidth: 450, margin: 'auto' }}>
+            <div className="section-header">
+              <h3 className="section-title">Account Settings</h3>
+              <button className="btn-ghost" onClick={() => setShowSettings(false)}>✕</button>
+            </div>
+            <div style={{ marginTop: 20 }}>
+              <div className="form-group">
+                <label className="form-label">Display Name</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  defaultValue={profile.name} 
+                  onBlur={(e) => updateProfile({ name: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Goal Weight (kg)</label>
+                <input 
+                  type="number" 
+                  className="form-input" 
+                  defaultValue={profile.goalWeight}
+                  onBlur={(e) => updateProfile({ goalWeight: Number(e.target.value) })}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Current Weight: {stats.currentWeight}kg</label>
+                <button className="btn btn-primary" style={{ width: '100%', marginTop: 10 }} onClick={() => setShowSettings(false)}>Close & Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="main-content">
