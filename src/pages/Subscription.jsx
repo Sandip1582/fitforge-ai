@@ -8,6 +8,12 @@ export default function Subscription() {
   const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success'
   const [paymentMethod, setPaymentMethod] = useState('card'); // 'card', 'upi'
   const [upiId, setUpiId] = useState('7620863033@ybl');
+  const [cardDetails, setCardDetails] = useState({
+    number: '4242 4242 4242 4242',
+    name: profile.name?.toUpperCase() || 'USER NAME',
+    expiry: '12/28',
+    cvc: '123'
+  });
 
   const handleUpgradeClick = (planName) => {
     if (profile.plan === planName) return;
@@ -160,40 +166,80 @@ export default function Subscription() {
 
                 {paymentMethod === 'card' ? (
                   <>
-                    {/* Mock Credit Card */}
+                    <div style={{ marginBottom: 16, fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>💳 Add New Card</div>
+                    {/* Mock Credit Card Preview */}
                     <div style={{ 
                       background: 'linear-gradient(135deg, #6C5CE7, #a29bfe)', 
                       borderRadius: 16, 
                       padding: 24, 
                       marginBottom: 24, 
                       color: 'white',
-                      boxShadow: '0 10px 20px rgba(108, 92, 231, 0.3)'
+                      boxShadow: '0 10px 20px rgba(108, 92, 231, 0.3)',
+                      transition: 'all 0.3s ease'
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
                         <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>FITFORGE</div>
-                        <div style={{ fontSize: '1.5rem' }}>💳</div>
+                        <div style={{ fontSize: '1.5rem' }}>VISA</div>
                       </div>
-                      <div style={{ fontSize: '1.2rem', letterSpacing: 4, marginBottom: 20 }}>•••• •••• •••• 4242</div>
+                      <div style={{ fontSize: '1.2rem', letterSpacing: 4, marginBottom: 20 }}>
+                        {cardDetails.number || '•••• •••• •••• ••••'}
+                      </div>
                       <div style={{ display: 'flex', gap: 32 }}>
-                        <div>
+                        <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Card Holder</div>
-                          <div style={{ fontSize: '0.85rem' }}>{profile.name?.toUpperCase()}</div>
+                          <div style={{ fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {cardDetails.name || 'YOUR NAME'}
+                          </div>
                         </div>
                         <div>
                           <div style={{ fontSize: '0.6rem', opacity: 0.8, textTransform: 'uppercase' }}>Expires</div>
-                          <div style={{ fontSize: '0.85rem' }}>12/28</div>
+                          <div style={{ fontSize: '0.85rem' }}>{cardDetails.expiry || 'MM/YY'}</div>
                         </div>
                       </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Card Number</label>
+                      <input 
+                        type="text" 
+                        className="form-input" 
+                        placeholder="4242 4242 4242 4242"
+                        value={cardDetails.number}
+                        onChange={(e) => setCardDetails({...cardDetails, number: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim().slice(0, 19)})}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Card Holder Name</label>
+                      <input 
+                        type="text" 
+                        className="form-input" 
+                        placeholder="FULL NAME"
+                        value={cardDetails.name}
+                        onChange={(e) => setCardDetails({...cardDetails, name: e.target.value.toUpperCase()})}
+                      />
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                       <div className="form-group">
                         <label className="form-label">Expiry Date</label>
-                        <input type="text" className="form-input" placeholder="MM/YY" defaultValue="12/28" />
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="MM/YY"
+                          value={cardDetails.expiry}
+                          onChange={(e) => setCardDetails({...cardDetails, expiry: e.target.value})}
+                        />
                       </div>
                       <div className="form-group">
                         <label className="form-label">CVC</label>
-                        <input type="password" className="form-input" placeholder="•••" defaultValue="123" />
+                        <input 
+                          type="password" 
+                          className="form-input" 
+                          placeholder="•••"
+                          value={cardDetails.cvc}
+                          onChange={(e) => setCardDetails({...cardDetails, cvc: e.target.value.slice(0, 3)})}
+                        />
                       </div>
                     </div>
                   </>
